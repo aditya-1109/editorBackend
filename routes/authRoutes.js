@@ -41,9 +41,61 @@ router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
-    res.redirect("http://localhost:3000/dashboard"); // Redirect to frontend
+    res.redirect("https://google-editor-pink.vercel.app/dashboard"); // Redirect to frontend
   }
 );
+
+router.post("/google/verify", async (req, res) => {
+  try {
+      const { token } = req.body;
+
+      // Verify the token
+      const ticket = await client.verifyIdToken({
+          idToken: token,
+          audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      const user = {
+          googleId: payload.sub,
+          email: payload.email,
+          name: payload.name,
+          picture: payload.picture,
+      };
+
+      res.json({ success: true, user });
+  } catch (error) {
+      console.error("Google Token Verification Error:", error);
+      res.status(401).json({ success: false, message: "Invalid Token" });
+  }
+});
+
+router.post("/google/verify", async (req, res) => {
+  try {
+      const { token } = req.body;
+
+      // Verify the token
+      const ticket = await client.verifyIdToken({
+          idToken: token,
+          audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      const user = {
+          googleId: payload.sub,
+          email: payload.email,
+          name: payload.name,
+          picture: payload.picture,
+      };
+
+      res.json({ success: true, user });
+  } catch (error) {
+      console.error("Google Token Verification Error:", error);
+      res.status(401).json({ success: false, message: "Invalid Token" });
+  }
+});
+
+
 
 // Logout Route
 router.get("/logout", (req, res) => {
