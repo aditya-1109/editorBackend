@@ -16,7 +16,7 @@ import router from "./routes/authRoutes.js";
 const app = express();
 app.use(cors());
 
-app.use(cors({ origin: "https://google-editor-pink.vercel.app/", credentials: true }));
+app.use(cors({ origin: "https://google-editor-pink.vercel.app", credentials: true }));
 app.use(express.json());
 app.use(
   session({
