@@ -73,25 +73,35 @@ router.post("/google/verify", async (req, res) => {
 router.post("/google/verify", async (req, res) => {
   try {
       const { token } = req.body;
+      if (!token) {
+          return res.status(400).json({ success: false, message: "Token is required" });
+      }
 
-      // Verify the token
+      // Verify the token with Google
       const ticket = await client.verifyIdToken({
           idToken: token,
           audience: process.env.GOOGLE_CLIENT_ID,
       });
 
-      const payload = ticket.getPayload();
-      const user = {
-          googleId: payload.sub,
-          email: payload.email,
-          name: payload.name,
-          picture: payload.picture,
-      };
+      const payload = ticket.getPayload(); // Extract user info
+      if (!payload) {
+          return res.status(401).json({ success: false, message: "Invalid Token" });
+      }
 
-      res.json({ success: true, user });
+      // Send user details as response
+      res.json({
+          success: true,
+          user: {
+              googleId: payload.sub,
+              name: payload.name,
+              email: payload.email,
+              picture: payload.picture,
+          },
+      });
+
   } catch (error) {
       console.error("Google Token Verification Error:", error);
-      res.status(401).json({ success: false, message: "Invalid Token" });
+      res.status(500).json({ success: false, message: "Token verification failed" });
   }
 });
 
